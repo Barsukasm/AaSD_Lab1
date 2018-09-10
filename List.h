@@ -155,24 +155,23 @@ bool List<T>::DeleteItem() {
 template <typename T>
 bool List<T>::DeleteByNumber(int pos) {//переделать
     if(pos>=size||pos<0) return false;
+
     Node *tmp=head;
     Node *prev=tail;
-    int i=0;
-    while(i!=pos){
+
+    for(int i=0;i<size;i++){
+        if(i==pos){
+            prev->next=tmp->next;
+            delete tmp;
+            size--;
+            if(i==0) head=tail->next;
+            if(i==size-1) tail=prev;
+            return true;
+        }
         tmp=tmp->next;
         prev=prev->next;
-        i++;
     }
-    if(i==0){
-        bool res = DeleteItem();
-        return res;
-    }
-    prev->next=tmp->next;
-    delete tmp;
-    if(pos==size-1) tail = prev;
-    size--;
-    return true;
-
+    return false;
 }
 
 template <typename T>
