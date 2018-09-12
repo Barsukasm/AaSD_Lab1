@@ -27,6 +27,10 @@ public:
 
 
 
+    int GetOperations(){
+        return operations;
+    }
+
     friend class Iterator;
 
     class Node{
@@ -36,6 +40,8 @@ public:
         Node(T t);//конструктор элемента
         Node();//конструктор по умолчанию
         ~Node();//деструктор
+
+        friend class List;
     };
 
     friend class Node;
@@ -43,7 +49,7 @@ public:
     class Iterator{
         List<T> *list;//текущий список
         Node *cur;//указатель на текущий элемент
-        bool status;//обошел список или нет
+        bool status;//true, если уже посещал голову списка, иначе - false
 
     public:
         Iterator(List<T> &t);
@@ -54,6 +60,7 @@ public:
     };
 
 private:
+    int operations;
     int size;//размер списка
     Node *head;//указатель на начало списка
     Node *tail;//указатель на последний элемент списка
@@ -105,6 +112,7 @@ void List<T>::AddItem(T t) {
         tail=tmp;
     }
     size++;
+    operations=1;
 }
 
 //включение нового значения в позицию с заданным номером
@@ -112,20 +120,23 @@ template <typename T>
 bool List<T>::AddItemByNumber(T t, int pos) {
     if(pos>=size||pos<0) return false;
     else{
+        operations=1;
         Node *added = new Node(t);
 
-        Node *tmp=head;
+        Node *tmp=tail;
         int i=0;
         while (i!=pos){
             tmp=tmp->next;
             i++;
+            operations++;
         }
         added->next=tmp->next;
         tmp->next=added;
-        size++;
-        if(pos==size-1){
+        if(pos==0){head=added;}
+        /*if(pos==size-1){
             tail=added;
-        }
+        }*/
+        size++;
         return true;
     }
 }
@@ -135,6 +146,7 @@ bool List<T>::DeleteItem() {
     bool removed= false;
     if(head==NULL) return removed;
     else{
+        operations=1;
         if(tail==head){
             delete head;
             head=NULL;
@@ -153,19 +165,23 @@ bool List<T>::DeleteItem() {
 }
 
 template <typename T>
-bool List<T>::DeleteByNumber(int pos) {//переделать
+bool List<T>::DeleteByNumber(int pos) {
     if(pos>=size||pos<0) return false;
 
+    operations=0;
     Node *tmp=head;
     Node *prev=tail;
 
-    for(int i=0;i<size;i++){
+    if(pos==0){
+        return DeleteItem();
+    }
+    for(int i=0;i<size;i++,operations++){
         if(i==pos){
             prev->next=tmp->next;
             delete tmp;
-            size--;
-            if(i==0) head=tail->next;
+            //if(i==0) head=tail->next;
             if(i==size-1) tail=prev;
+            size--;
             return true;
         }
         tmp=tmp->next;
@@ -183,9 +199,9 @@ bool List<T>::DeleteByValue(T t) {
         if(*(tmp->item)==t){
             prev->next=tmp->next;
             delete tmp;
-            size--;
             if(i==0) head=tail->next;
             if(i==size-1) tail=prev;
+            size--;
             return true;
         }
         tmp=tmp->next;
@@ -198,8 +214,8 @@ template <typename T>
 void List<T>::CleanList() {
     Node* tmp;
     for(int i=0;i<size;i++){
-        tmp = head->next;
-        head->next=tmp->next;
+        tmp = tail->next;
+        tail->next=tmp->next;
         delete tmp;
     }
     head=NULL;
@@ -210,7 +226,8 @@ void List<T>::CleanList() {
 template <typename T>
 bool List<T>::FindItem(T t) {
     Node *tmp=head;
-    for(int i=0;i<size;i++){
+    operations=0;
+    for(int i=0;i<size;i++,operations++){
         if(*(tmp->item)==t) return true;//возвращаем true, если было найдено соответствующее значение
         tmp=tmp->next;
     }
@@ -314,4 +331,5 @@ List<T>::Node::Node(T t) {
 template <typename T>
 List<T>::Node::~Node() {
     delete item;
+    next=NULL;
 }

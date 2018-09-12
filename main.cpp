@@ -1,9 +1,38 @@
 #include <iostream>
 #include "List.h"
+#include <random>
 
 using namespace::std;
 
+void testComplexity(int number, int min, int max){
+    List<int> test;
+    test.CleanList();
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_int_distribution<> distItem(min,max);
+    uniform_int_distribution<> distIndex(0,number);
 
+    for(int i=0;i<number;i++){
+        test.AddItem(distItem(mt));
+    }
+    long long d=0, ins=0, f=0;
+    for(int i=0;i<number;i++){
+        test.DeleteByNumber(distIndex(mt));
+        d+=test.GetOperations();
+
+        test.AddItemByNumber(distIndex(mt),distItem(mt));
+        ins+=test.GetOperations();
+
+        test.FindItem(distItem(mt));
+        f+=test.GetOperations();
+    }
+
+
+    cout<<"Time complexity"<<endl;
+    cout<<"Delete: "<<(float)d/number<<endl;
+    cout<<"Insert: "<<(float)ins/number<<endl;
+    cout<<"Find: "<<(float)f/number<<endl;
+}
 
 void showMenu(){
     cout << endl;
@@ -24,7 +53,7 @@ void showMenu(){
     cout << "14. Show value at iterator's position" << endl;
     cout << "15. Shift iterator" << endl;
     cout << "16. List size" << endl;
-    cout << "17. Test (not realized yet)" << endl;
+    cout << "17. Test" << endl;
     cout << "0. Exit" << endl;
 }
 
@@ -186,6 +215,17 @@ int main() {
                 }
 
                 case 17:{
+                    int number, min, max;
+                    cout<<"Input list length: ";
+                    cin>>number;
+                    cout<<endl;
+                    cout<<"Input minimum value: ";
+                    cin>>min;
+                    cout<<endl;
+                    cout<<"Input maximum value: ";
+                    cin>>max;
+                    cout<<endl;
+                    testComplexity(number,min,max);
                     break;
                 }
             }
