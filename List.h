@@ -292,7 +292,7 @@ List<T>::Iterator::Iterator(List<T> &t) {
 
 template <typename T>
 bool List<T>::Iterator::operator++(int) {
-    if(list->isEmpty()) return false;
+    if(!inList()) return false;
     cur=cur->next;
     //if(!inList()) throw ITERATOR_END;
     return true;
@@ -300,7 +300,7 @@ bool List<T>::Iterator::operator++(int) {
 
 template <typename T>
 T& List<T>::Iterator::operator*() {
-    if(!list->isEmpty()) return *(cur->item);
+    if(inList()) return *(cur->item);
     else throw EMPTY_LIST;
 }
 
@@ -313,7 +313,7 @@ bool List<T>::Iterator::begin() {
 
 template <typename T>
 bool List<T>::Iterator::inList() {
-    return (cur!=NULL);//если мы уже один раз посещали голову списка и вернулись к ней, то итератор обошел весь список (возвращаем false)
+    return (!list->isEmpty());
 }
 
 //------------Методы класса Node---------------
