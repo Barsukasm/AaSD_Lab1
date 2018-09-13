@@ -1,37 +1,52 @@
 #include <iostream>
 #include "List.h"
 #include <random>
+#include <time.h>
 
 using namespace::std;
+
+long distIt(int min,int max){
+    return (min+(rand()<<16|rand())%max);
+}
+
+long distInd(int number){
+    return ((rand()<<16|rand())%number);
+}
 
 void testComplexity(int number, int min, int max){
     List<int> test;
     test.CleanList();
-    random_device rd;
+    srand((unsigned int)time(NULL));
+    /*random_device rd;
     mt19937 mt(rd());
     uniform_int_distribution<> distItem(min,max);
-    uniform_int_distribution<> distIndex(0,number);
+    uniform_int_distribution<> distIndex(0,number);*/
 
     for(int i=0;i<number;i++){
-        test.AddItem(distItem(mt));
+        test.AddItem(distIt(min,max));
     }
     long long d=0, ins=0, f=0;
     for(int i=0;i<number;i++){
-        test.DeleteByNumber(distIndex(mt));
+        test.DeleteByNumber(distInd(number));
         d+=test.GetOperations();
 
-        test.AddItemByNumber(distIndex(mt),distItem(mt));
+        test.AddItemByNumber(distIt(min,max), distInd(number));
         ins+=test.GetOperations();
 
-        test.FindItem(distItem(mt));
+        test.FindItem(distIt(min,max));
         f+=test.GetOperations();
     }
 
 
     cout<<"Time complexity"<<endl;
-    cout<<"Delete: "<<(float)d/number<<endl;
-    cout<<"Insert: "<<(float)ins/number<<endl;
-    cout<<"Find: "<<(float)f/number<<endl;
+    cout<<"Delete: "<<endl;
+    cout<<"Theoretical: "<<(float)number/2<<" Practical: "<<(float)d/number<<endl;
+    cout<<"Insert: "<<endl;
+    cout<<"Theoretical: "<<(float)number/2<<" Practical: "<<(float)ins/number<<endl;
+    cout<<"Find: "<<endl;
+    cout<<"Theoretical: "<<(float)number/2<<" Practical: "<<(float)f/number<<endl;
+    cout<<"------------------------------"<<endl;
+    cout<<"List size: "<< test.GetSize();
 }
 
 void showMenu(){
@@ -77,14 +92,14 @@ int main() {
                     break;
 
                 case 1:{
-                    if(!testList.isEmpty()){
-                        iter.begin();
+                    if(!iter.begin())cout<<"List is empty!"<<endl;
+                    else{
                         cout<<"List contains:"<<endl;
                         for(int i=0;i<testList.GetSize();i++, iter++){
-                            cout<<"Position: "<<i<<" Value: " << *iter<<endl;
+                            //cout<<"Position: "<<i<<" Value: " << *iter<<endl;
+                            cout<<*iter<<" ";
                         }
-                    } else{
-                        cout<<"List is empty!"<<endl;
+                        cout<<endl;
                     }
                     break;
                 }
@@ -184,8 +199,7 @@ int main() {
                 }
 
                 case 12:{
-                    iter.begin();
-                    cout<<"Iterator successfully moved at beginning of list"<<endl;
+                    (iter.begin())? cout<<"Iterator successfully moved at beginning of list"<<endl:cout<<"Empty list"<<endl;
                     break;
                 }
 
@@ -204,8 +218,8 @@ int main() {
                 }
 
                 case 15:{
-                    iter++;
-                    cout<<"Iterator moved to next element"<<endl;
+                    //(iter++)? cout<<"Iterator moved to next element"<<endl:cout<<"List is empty"<<endl;
+                    cout<<iter++<<endl;
                     break;
                 }
 

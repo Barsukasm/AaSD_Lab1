@@ -49,13 +49,13 @@ public:
     class Iterator{
         List<T> *list;//текущий список
         Node *cur;//указатель на текущий элемент
-        bool status;//true, если уже посещал голову списка, иначе - false
 
     public:
         Iterator(List<T> &t);
-        Iterator &operator++(int);//переход к следующему элементу
-        T& operator*();//перегрузка указателя
-        T &begin();//установка на начало списка
+
+        bool operator++(int);//переход к следующему элементу//переделать на bool
+        T& operator*();//перегрузка указателя//добавить проверку состояния итератора, выброс исключения
+        bool begin();//установка на начало списка//переделать bool
         bool inList();//проверка на нахождение внутри списка
     };
 
@@ -118,7 +118,7 @@ void List<T>::AddItem(T t) {
 //включение нового значения в позицию с заданным номером
 template <typename T>
 bool List<T>::AddItemByNumber(T t, int pos) {
-    if(pos>=size||pos<0) return false;
+    if(pos>size||pos<0) return false;
     else{
         operations=1;
         Node *added = new Node(t);
@@ -133,9 +133,9 @@ bool List<T>::AddItemByNumber(T t, int pos) {
         added->next=tmp->next;
         tmp->next=added;
         if(pos==0){head=added;}
-        /*if(pos==size-1){
+        if(pos==size){
             tail=added;
-        }*/
+        }
         size++;
         return true;
     }
@@ -265,7 +265,7 @@ bool List<T>::isEmpty() {
 
 template <typename T>
 int List<T>::GetSize() {
-    return (!this->isEmpty())? size: throw EMPTY_LIST;
+    return size;
 }
 
 template <typename T>
@@ -288,35 +288,32 @@ template <typename T>
 List<T>::Iterator::Iterator(List<T> &t) {
     list=&t;
     cur=list->head;
-    status = false;
 }
 
 template <typename T>
-typename List<T>::Iterator& List<T>::Iterator::operator++(int) {
-    if(list->isEmpty()) throw EMPTY_LIST;
+bool List<T>::Iterator::operator++(int) {
+    if(list->isEmpty()) return false;
     cur=cur->next;
-    status = true;
     //if(!inList()) throw ITERATOR_END;
-    return *this;
+    return true;
 }
 
 template <typename T>
 T& List<T>::Iterator::operator*() {
-    if(inList()) return *(cur->item);
-    else throw ITERATOR_END;
+    if(!list->isEmpty()) return *(cur->item);
+    else throw EMPTY_LIST;
 }
 
 template <typename T>
-T& List<T>::Iterator::begin() {
-    if(list->isEmpty()) throw EMPTY_LIST;
+bool List<T>::Iterator::begin() {
+    if(list->isEmpty()) return false;
     cur=list->head;
-    status = false;
-    return *(cur->item);
+    return true;
 }
 
 template <typename T>
 bool List<T>::Iterator::inList() {
-    return (!(cur==list->head&&status));//если мы уже один раз посещали голову списка и вернулись к ней, то итератор обошел весь список (возвращаем false)
+    return (cur!=NULL);//если мы уже один раз посещали голову списка и вернулись к ней, то итератор обошел весь список (возвращаем false)
 }
 
 //------------Методы класса Node---------------
